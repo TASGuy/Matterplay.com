@@ -1,6 +1,7 @@
 <html>
 <head>
 <title>Matterplay</title>
+<link rel="icon" type="image/x-icon" href="./favicon.ico">
 <style>
 html {
 margin: 0px;
@@ -35,19 +36,27 @@ background: whitesmoke;
 img {
 margin: 5px;
 }
-
-
-@media (max-width: 767px) {
-body {
-font-size: 40px;
-}
-}
 </style>
+<style id="mobileStyles"></style>
 </head>
 <body>
 <p>Hi, how are you?</p>
 <button id="hhayPic" onclick="replaceMe('hhayPic','./HiHowAreYou.png')" style="max-width: 500px; width: 100%; height: 500px;">Click to reveal hidden text.</button>
 <script>
+function resize() {
+if (window.innerWidth <= 767) {
+document.getElementById("mobileStyles").textContent = `
+body {
+font-size: 40px;
+}
+`;
+} else {
+document.getElementById("mobileStyles").textContent = "";
+}
+}
+window.addEventListener("resize", resize);
+resize();
+
 function replaceMe(id, path) {
 let button = document.getElementById(id);
 let img = document.createElement("img");
