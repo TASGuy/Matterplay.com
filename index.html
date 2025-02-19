@@ -28,6 +28,11 @@ height: auto;
 }
 </style>
 <style id="fontSize"></style>
+<script>
+if (location.pathname !== location.pathname.toLowerCase()) {
+location.replace(location.origin + location.pathname.toLowerCase());
+}
+</script>
 </head>
 <body>
 <p>Hi.
