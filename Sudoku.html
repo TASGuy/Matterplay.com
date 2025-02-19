@@ -1,0 +1,396 @@
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudoku Game</title>
+<style>
+
+html, body {
+margin: 0px;
+padding: 0px;
+background-color: #dedede;
+height: 100vh;
+width: 100vw;
+
+/* Disable text selection for the entire document: */
+-webkit-user-select: none; /* Safari */
+-moz-user-select: none; /* Firefox */
+-ms-user-select: none; /* Internet Explorer/Edge */
+user-select: none; /* Standard syntax */
+
+.sudoku-puzzle {
+border: none;
+position: absolute;
+cursor: pointer;
+}
+
+.number-button, .options-button {
+height: auto;
+background-color: #ffffff;
+border: 2px solid black;
+border-radius: 10px;
+position: absolute;
+}
+.number-button:hover, .options-button:hover {
+cursor: pointer;
+}
+.number-button:active, .options-button:active {
+background-color: #f5f5f5;
+}
+
+}
+
+</style>
+</head>
+<body>
+<button class="options-button" onclick="newSudoku()">New Sudoku</button>
+<button class="options-button" onclick="checkAnswer()" id="check-answer">Check answer</button>
+<button class="options-button" onclick="seeAnswer()">See answer</button>
+<canvas id="canvas" class="sudoku-puzzle"></canvas>
+<button class="number-button" onclick="placeNumber(1)">1</button>
+<button class="number-button" onclick="placeNumber(2)">2</button>
+<button class="number-button" onclick="placeNumber(3)">3</button>
+<button class="number-button" onclick="placeNumber(4)">4</button>
+<button class="number-button" onclick="placeNumber(5)">5</button>
+<button class="number-button" onclick="placeNumber(6)">6</button>
+<button class="number-button" onclick="placeNumber(7)">7</button>
+<button class="number-button" onclick="placeNumber(8)">8</button>
+<button class="number-button" onclick="placeNumber(9)">9</button>
+<button class="number-button" onclick="placeNumber(0)">0</button>
+<script>
+
+function generateSudokuPuzzle() {
+function shuffle(array) {
+for (let i = array.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[array[i], array[j]] = [array[j], array[i]];
+}
+return array;
+}
+
+function findEmptyPosition(grid) {
+for (let row = 0; row < 9; row++) {
+for (let col = 0; col < 9; col++) {
+if (grid[row][col] === 0) return [row, col];
+}
+}
+return null;
+}
+
+function isValid(grid, row, col, num) {
+for (let i = 0; i < 9; i++) {
+if (grid[row][i] === num || grid[i][col] === num) return false;
+let subgridRow = 3 * Math.floor(row / 3) + Math.floor(i / 3);
+let subgridCol = 3 * Math.floor(col / 3) + i % 3;
+if (grid[subgridRow][subgridCol] === num) return false;
+}
+return true;
+}
+
+function fillGrid(grid) {
+let emptyPos = findEmptyPosition(grid);
+if (!emptyPos) return true;
+
+let [row, col] = emptyPos;
+let numbers = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+for (let num of numbers) {
+if (isValid(grid, row, col, num)) {
+grid[row][col] = num;
+if (fillGrid(grid)) return true;
+grid[row][col] = 0;
+}
+}
+return false;
+}
+
+function countSolutions(grid) {
+let emptyPos = findEmptyPosition(grid);
+if (!emptyPos) return 1;
+
+let [row, col] = emptyPos;
+let solutions = 0;
+
+for (let num = 1; num <= 9; num++) {
+if (isValid(grid, row, col, num)) {
+grid[row][col] = num;
+solutions += countSolutions(grid);
+grid[row][col] = 0;
+
+if (solutions > 1) break;
+}
+}
+
+return solutions;
+}
+
+function generatePuzzle(grid) {
+let puzzle = grid.map(row => [...row]);
+let attempts = 5;
+
+while (attempts > 0) {
+let row = Math.floor(Math.random() * 9);
+let col = Math.floor(Math.random() * 9);
+while (puzzle[row][col] === 0) {
+row = Math.floor(Math.random() * 9);
+col = Math.floor(Math.random() * 9);
+}
+
+let backup = puzzle[row][col];
+puzzle[row][col] = 0;
+
+let gridCopy = puzzle.map(row => [...row]);
+let solutionCount = countSolutions(gridCopy);
+
+if (solutionCount !== 1) {
+puzzle[row][col] = backup;
+attempts--;
+}
+}
+
+return { puzzle, answer: grid, written: [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]] };
+}
+
+let grid = Array.from({ length: 9 }, () => Array(9).fill(0));
+fillGrid(grid);
+let puzzle = generatePuzzle(grid);
+return puzzle;
+}
+
+// Setting the Sudoku
+function lse() {
+let testKey = "test";
+try {
+localStorage.setItem(testKey, "testValue");
+localStorage.removeItem(testKey);
+return true;
+} catch (e) {
+return false;
+}
+}
+function load() {
+let loading = lse() ? JSON.parse(localStorage.getItem("Sudoku")) : generateSudokuPuzzle();
+if (!loading) {
+loading = generateSudokuPuzzle();
+save(loading);
+}
+return loading;
+}
+function save(obj) {
+if (lse()) localStorage.setItem("Sudoku", JSON.stringify(obj));
+}
+var Sudoku = load();
+
+// Getting canvas:
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+// Getting position from string with "px" on the end function:
+function getFromPx(str) {
+return parseFloat(str.slice(0, -2));
+}
+
+// Resizing elements:
+window.addEventListener("resize", resize);
+function resize() {
+canvas.width = Math.min(400, window.innerWidth - 20);
+canvas.height = canvas.width;
+canvas.style.left = (window.innerWidth - canvas.width) / 2 + "px";
+canvas.style.top = (window.innerHeight - canvas.height) / 2 + "px";
+let numberButtons = document.getElementsByClassName("number-button");
+for (let i = 0; i < numberButtons.length; i++) {
+numberButtons[i].style.width = canvas.width / 10 + "px";
+numberButtons[i].style.left = getFromPx(canvas.style.left) + (i * (canvas.width / 10)) + "px";
+numberButtons[i].style.top = getFromPx(canvas.style.top) + canvas.height + "px";
+numberButtons[i].style.height = numberButtons[i].style.width;
+numberButtons[i].style.fontSize = getFromPx(numberButtons[i].style.height) / 3 + "px";
+}
+let numberButtonsHeight = getFromPx(numberButtons[0].style.height);
+let optionButtons = document.getElementsByClassName("options-button");
+for (let i = 0; i < optionButtons.length; i++) {
+optionButtons[i].style.width = canvas.width / 3 + "px";
+optionButtons[i].style.left = getFromPx(canvas.style.left) + (i * (canvas.width / 3)) + "px";
+optionButtons[i].style.height = numberButtonsHeight + "px";
+optionButtons[i].style.top = getFromPx(canvas.style.top) - getFromPx(optionButtons[i].style.height) + "px";
+optionButtons[i].style.fontSize = getFromPx(optionButtons[i].style.height) * 1/3 + "px";
+}
+
+click({ clientX: 0, clientY: 0 });
+}
+
+// Mobile compatibility:
+canvas.addEventListener("touchstart", handleTouch);
+canvas.addEventListener("touchmove", handleTouch);
+canvas.addEventListener("touchend", handleTouch);
+function handleTouch(e) {
+e.preventDefault();
+if (e.type === "touchstart") click({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+}
+
+// Drawing/click event handler:
+var selected = { row: undefined, col: undefined };
+canvas.addEventListener("click", click);
+function click(e) {
+
+// Background:
+ctx.fillStyle = "rgb(255, 255, 255)";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Setting the size of things:
+var size = {};
+size.lines = 1;
+size.linesThick = 2;
+size.square = canvas.width / 9;
+size.borderSquare = 2;
+
+// Setting the mouse position relative to the canvas:
+let mouse = { X: e.clientX - getFromPx(canvas.style.left), Y: e.clientY - getFromPx(canvas.style.top) };
+
+// Selecting the square:
+if (e.clientX !== 0 && e.clientY !== 0) {
+let select = { row: Math.floor(mouse.X / size.square), col: Math.floor(mouse.Y / size.square) };
+if (!(select.row === selected.row && select.col === selected.col)) {
+selected = Object.assign(select);
+} else {
+selected = { row: undefined, col: undefined };
+}
+}
+
+// Drawing selected:
+if (selected.row !== undefined && selected.col !== undefined) {
+ctx.fillStyle = "rgba(0, 179, 255, 0.2)";
+let topLeftOfSelected = { row: Math.floor(selected.row / 3) * 3, col: Math.floor(selected.col / 3) * 3 };
+for (let i = 0; i < 9 * 9; i++) {
+let pos = { row: i % 9, col: Math.floor(i / 9) };
+pos.X = pos.row * size.square;
+pos.Y = pos.col * size.square;
+if (pos.row === selected.row || pos.col === selected.col || (topLeftOfSelected.row + 2 >= pos.row && topLeftOfSelected.row <= pos.row && topLeftOfSelected.col + 2 >= pos.col && topLeftOfSelected.col <= pos.col)) ctx.fillRect(pos.X, pos.Y, size.square, size.square);
+}
+ctx.fillRect(selected.row * size.square, selected.col * size.square, size.square, size.square);
+let selectedNumber = undefined;
+if (Sudoku.puzzle[selected.row][selected.col] !== 0) {
+selectedNumber = Sudoku.puzzle[selected.row][selected.col];
+} else if (Sudoku.written[selected.row][selected.col] !== 0) {
+selectedNumber = Sudoku.written[selected.row][selected.col];
+}
+if (selectedNumber) {
+ctx.fillStyle = "rgba(0, 134, 191, 0.4)";
+for (let i = 0; i < 9 * 9; i++) {
+let pos = { row: i % 9, col: Math.floor(i / 9) };
+pos.X = pos.row * size.square;
+pos.Y = pos.col * size.square;
+if (selectedNumber === Sudoku.puzzle[pos.row][pos.col] || selectedNumber === Sudoku.written[pos.row][pos.col]) ctx.fillRect(pos.X, pos.Y, size.square, size.square);
+}
+}
+}
+
+// Grid:
+function drawLine(X1, Y1, diffX, diffY) {
+ctx.beginPath();
+ctx.moveTo(X1, Y1);
+ctx.lineTo(X1 + diffX, Y1 + diffY);
+ctx.stroke();
+}
+ctx.strokeStyle = "rgb(0, 0, 0)";
+ctx.lineJoin = "miter";
+for (let i = 0; i < 8; i++) {
+ctx.lineWidth = (i + 1) % 3 === 0 ? size.linesThick : size.lines;
+drawLine(0, (i % 8 + 1) * size.square, canvas.width, 0);
+}
+for (let i = 0; i < 8; i++) {
+ctx.lineWidth = (i + 1) % 3 === 0 ? size.linesThick : size.lines;
+drawLine((i % 8 + 1) * size.square, 0, 0, canvas.height);
+}
+ctx.lineWidth = size.linesThick;
+ctx.beginPath();
+ctx.moveTo(size.linesThick / 2, size.linesThick / 2);
+ctx.lineTo(canvas.width - size.linesThick / 2, size.linesThick / 2);
+ctx.lineTo(canvas.width - size.linesThick / 2, canvas.height - size.linesThick / 2);
+ctx.lineTo(size.linesThick / 2, canvas.height - size.linesThick / 2);
+ctx.lineTo(size.linesThick / 2, size.linesThick / 2);
+ctx.lineTo(size.linesThick / 2 + 1, size.linesThick / 2);
+ctx.stroke();
+
+// Numbers:
+ctx.font = (canvas.height / 9) - (size.borderSquare * 2) + "px Arial";
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
+ctx.fillStyle = "rgb(0, 0, 0)";
+for (let i = 0; i < 9 * 9; i++) {
+let pos = { row: i % 9, col: Math.floor(i / 9) };
+pos.X = (pos.row * size.square) + size.borderSquare + ((size.square - size.borderSquare * 2) / 2);
+pos.Y = (pos.col * size.square) + size.borderSquare + ((size.square - size.borderSquare * 2) / 2);
+if (Sudoku.puzzle[pos.row][pos.col] !== 0) ctx.fillText(Sudoku.puzzle[pos.row][pos.col], pos.X, pos.Y);
+}
+
+// Written numbers:
+ctx.fillStyle = "rgb(0, 75, 0)";
+for (let i = 0; i < 9 * 9; i++) {
+let pos = { row: i % 9, col: Math.floor(i / 9) };
+pos.X = (pos.row * size.square) + size.borderSquare + ((size.square - size.borderSquare * 2) / 2);
+pos.Y = (pos.col * size.square) + size.borderSquare + ((size.square - size.borderSquare * 2) / 2);
+if (Sudoku.written[pos.row][pos.col] !== 0) ctx.fillText(Sudoku.written[pos.row][pos.col], pos.X, pos.Y);
+}
+
+// Saving:
+if (e.clientX !== 0 && e.clientY !== 0) save(Sudoku);
+
+}
+
+// Placing numbers:
+function placeNumber(n) {
+if (selected.row !== undefined && selected.col !== undefined && Sudoku.puzzle[selected.row][selected.col] === 0) Sudoku.written[selected.row][selected.col] = n;
+save(Sudoku);
+click({ clientX: 0, clientY: 0 });
+}
+
+// Getting a new Sudoku:
+function newSudoku() {
+if (lse()) localStorage.removeItem("Sudoku");
+Sudoku = load();
+selected = { row: undefined, col: undefined };
+click({ clientX: 0, clientY: 0 });
+}
+
+// Checking answer:
+function checkAnswer() {
+let fullThing = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]];
+for (let i = 0; i < 9 * 9; i++) {
+let pos = { row: i % 9, col: Math.floor(i / 9) };
+if (Sudoku.puzzle[pos.row][pos.col] !== 0) {
+fullThing[pos.row][pos.col] = Sudoku.puzzle[pos.row][pos.col];
+} else {
+fullThing[pos.row][pos.col] = Sudoku.written[pos.row][pos.col];
+}
+}
+document.getElementById("check-answer").style.color = JSON.stringify(fullThing) === JSON.stringify(Sudoku.answer) ? "#00bb00" : "#ff0000";
+setTimeout(function () {
+document.getElementById("check-answer").style.color = "#000000";
+}, 2000);
+}
+
+// Seeing the answer:
+function seeAnswer() {
+let shouldWrite = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]];
+for (let i = 0; i < 9 * 9; i++) {
+let pos = { row: i % 9, col: Math.floor(i / 9) };
+if (Sudoku.puzzle[pos.row][pos.col] !== Sudoku.answer[pos.row][pos.col]) shouldWrite[pos.row][pos.col] = Sudoku.answer[pos.row][pos.col];
+}
+Sudoku.written = shouldWrite;
+selected = { row: undefined, col: undefined };
+click({ clientX: 0, clientY: 0 });
+save(Sudoku);
+}
+
+// Unselecting when you click on the background:
+document.addEventListener("click", function (event) {
+if (event.target === document.body) {
+selected = { row: undefined, col: undefined };
+click({ clientX: 0, clientY: 0 });
+}
+});
+
+// Starting the script by resizing the window:
+resize();
+</script>
+</body>
+</html>
