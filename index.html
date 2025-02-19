@@ -1,0 +1,49 @@
+<html>
+<head>
+<title>Matterplay</title>
+<style>
+html {
+margin: 0px;
+padding: 0px;
+}
+body {
+margin: 0px;
+padding: 20px;
+font-family: Arial, sans-serif;
+font-size: 20px;
+}
+
+p {
+margin: 5px;
+padding: 0px;
+}
+
+button {
+margin: 5px;
+padding: 5px;
+border: 2px solid black;
+border-radius: 4px;
+background: white;
+color: black;
+}
+button:hover {
+background: whitesmoke;
+}
+</style>
+</head>
+<body>
+<p>Hi, how are you?</p>
+<button id="hhayPic" onclick="replaceMe('hhayPic','./HiHowAreYou.png')" style="width: 500px; height: 500px;">Click to reveal hidden text.</button>
+<script>
+function replaceMe(id, path) {
+let button = document.getElementById(id);
+let img = document.createElement("img");
+img.src = path;
+img.alt = "INTO THE UNKNOWN!!!!!";
+img.style.width = button.style.width;
+img.style.height = button.style.height;
+button.parentNode.replaceChild(img, button);
+}
+</script>
+</body>
+</html>
