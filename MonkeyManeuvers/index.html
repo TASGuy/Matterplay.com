@@ -71,7 +71,7 @@ const app = initializeApp(firebaseConfig);
 
 let HTMLCode = document.documentElement.outerHTML;
 
-console.log("%cThe console is for developers only, please do not check in here if you do not know what  you're doing.", "color: black; font-size: 20px; font-weight: bold;");
+console.log("%cThe console is for developers only, please do not check in here if you do not know what you're doing.", "color: black; font-size: 20px; font-weight: bold;");
 
 document.body.style.margin = "0px";
 document.body.style.padding = "0px";
@@ -141,12 +141,18 @@ mdw = { X: 20, Y: 80, w: canvas.width - 40, h: canvas.height - 100 };
 setMdw();
 
 // Resizing canvas to window:
-window.addEventListener("resize", function () {
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+function resizeCanvas() {
+let dpr = window.devicePixelRatio / 1.375 || 1;
+canvas.width = window.innerWidth * dpr;
+canvas.height = window.innerHeight * dpr;
+canvas.style.width = window.innerWidth + "px";
+canvas.style.height = window.innerHeight + "px";
+ctx.scale(dpr, dpr);
 middle = { X: canvas.width / 2, Y: canvas.height / 2 };
 canvas.width < canvas.height ? setMdw() : setMd();
-});
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
 // Setting the mouse position:
 let mouse = { X: canvas.width / 2, Y: canvas.height / 2 };
@@ -155,7 +161,7 @@ mouse.X = event.pageX;
 mouse.Y = event.pageY;
 });
 
-let version = "V.1.0.6";
+let version = "V.1.0.7";
 document.title = "Monkey Maneuvers Online " + version;
 function drawVersion() {
 ctx.textAlign = "left";
@@ -1325,7 +1331,7 @@ document.body.style.padding = "0px";
 
 let contactIsShowing = false;
 let contact = document.createElement("p");
-contact.innerHTML = `This game was created by Tihamer Szombathy, internet username: TASGuy. Email: tihamertnt@gmail.com<br><a href="https://Matterplay.com/TASGuy/">Click here to visit my website.</a><br><a href="https://discord.gg/ck2f6E96xf">Click here to join the Monkey Maneuvers' Discord server.</a>`;
+contact.innerHTML = `This game was created by Tihamer Szombathy, internet username: TASGuy. Email: tihamertnt@gmail.com<br><a href="https://matterplay.com/TASGuy/">Click here to visit my website.</a><br><a href="https://discord.gg/ck2f6E96xf">Click here to join the Monkey Maneuvers' Discord server.</a>`;
 let showButton = document.createElement("button");
 showButton.innerHTML = "Click here to show the info.";
 showButton.style = "padding: 4px;";
@@ -1744,6 +1750,8 @@ addChangelog("", "V.1.0.4", "Feb/2/2025 - (I took a break.)<br>Added a button in
 addChangelog("", "V.1.0.5", "Made the Google Site just a button that opens Monkey Maneuvers in another window so that it looks like a real website or game.");
 
 addChangelog("", "V.1.0.6", "Added Monkey Maneuvers to Matterplay.com instead. Also made a thing that logs to the console that it's only for developers.");
+
+addChangelog("", "V.1.0.7", "Made it so that if you <i>do somehow</i> zoom the canvas, it doesn't zoom the picture.");
 }
 </script>
 </body>
