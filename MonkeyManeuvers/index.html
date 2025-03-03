@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <base target="_blank">
@@ -142,12 +143,15 @@ setMdw();
 
 // Resizing canvas to window:
 function resizeCanvas() {
-let dpr = window.devicePixelRatio / 1.375 || 1;
-canvas.width = window.innerWidth * dpr;
-canvas.height = window.innerHeight * dpr;
+let dpr = window.devicePixelRatio || 1;
+canvas.width = window.innerWidth/* * dpr*/;
+canvas.height = window.innerHeight/* * dpr*/;
+/*
 canvas.style.width = window.innerWidth + "px";
 canvas.style.height = window.innerHeight + "px";
+ctx.setTransform(1, 0, 0, 1, 0, 0);
 ctx.scale(dpr, dpr);
+*/
 middle = { X: canvas.width / 2, Y: canvas.height / 2 };
 canvas.width < canvas.height ? setMdw() : setMd();
 }
@@ -1331,7 +1335,7 @@ document.body.style.padding = "0px";
 
 let contactIsShowing = false;
 let contact = document.createElement("p");
-contact.innerHTML = `This game was created by Tihamer Szombathy, internet username: TASGuy. Email: tihamertnt@gmail.com<br><a href="https://matterplay.com/TASGuy/">Click here to visit my website.</a><br><a href="https://discord.gg/ck2f6E96xf">Click here to join the Monkey Maneuvers' Discord server.</a>`;
+contact.innerHTML = `This game was created by Tihamer Szombathy, internet username: TASGuy. Email: tihamertnt@gmail.com<br><a href="https://sites.google.com/view/TASGuy">Click here to visit my website.</a><br><a href="https://discord.gg/ck2f6E96xf">Click here to join the Monkey Maneuvers' Discord server.</a>`;
 let showButton = document.createElement("button");
 showButton.innerHTML = "Click here to show the info.";
 showButton.style = "padding: 4px;";
