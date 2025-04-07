@@ -109,14 +109,19 @@ screenWidth = window.innerWidth;
 }
 
 async function checkURLValidity(URL) {
+/*
+// Hasn't been working so I'm taking it down;
 let response;
 try {
 response = await fetch(URL, { method: "HEAD" });
-return response.ok;
+if (response.ok === true) return true;
+if (response.ok === false) return false;
 } catch (error) {
 //console.error("Error checking URL validity:", error);
 return false;
 }
+*/
+return true;
 }
 
 var howManyOfEachOption = { All: 0 };
@@ -160,11 +165,17 @@ howManyOfEachOption[section[i]] = 1;
 }
 }
 
-if ((forDevice === "mobile" && onMobile() || forDevice === "PC" && !onMobile() || forDevice === "both") && checkURLValidity(gameURL)) howManyOfEachOption.All++;
+let valid = undefined;
+async function getValid(URL) {
+return/*valid =*/ await checkURLValidity(URL);
+}
+valid = getValid(gameURL)/*.then(() => {})*/;
+
+if ((forDevice === "mobile" && onMobile() || forDevice === "PC" && !onMobile() || forDevice === "both") && valid) howManyOfEachOption.All++;
 
 if (!previouslySelectedName) previouslySelectedName = "All";
 
-if ((forDevice === "mobile" && onMobile() || forDevice === "PC" && !onMobile() || forDevice === "both") && checkURLValidity(gameURL) && section && (previouslySelectedName === "All" || previouslySelectedName === section || section.includes(previouslySelectedName))) {
+if ((forDevice === "mobile" && onMobile() || forDevice === "PC" && !onMobile() || forDevice === "both") && valid && section && (previouslySelectedName === "All" || previouslySelectedName === section || section.includes(previouslySelectedName))) {
 let divWidth = onMobile() ? screenWidth - 30 : 250;
 
 let game = document.createElement("div");
@@ -249,7 +260,7 @@ addGame("https://getaway-shootout.com/1.embed", "Getaway Shootout", "is an onlin
 
 addGame("https://html5.gamedistribution.com/rvvASMiM/5b0abd4c0faa4f5eb190a9a16d5a1b4c/index.html?gd_sdk_referrer_url=https%3A%2F%2Fbasketrandom.com%2Fmoto-x3m&gd_zone_config=eyJwYXJlbnRVUkwiOiJodHRwczovL2Jhc2tldHJhbmRvbS5jb20vbW90by14M20iLCJwYXJlbnREb21haW4iOiJiYXNrZXRyYW5kb20uY29tIiwidG9wRG9tYWluIjoiYmFza2V0cmFuZG9tLmNvbSIsImhhc0ltcHJlc3Npb24iOmZhbHNlLCJsb2FkZXJFbmFibGVkIjp0cnVlLCJob3N0IjoiaHRtbDUuZ2FtZWRpc3RyaWJ1dGlvbi5jb20iLCJ2ZXJzaW9uIjoiMS41LjE3In0%253D", "MotoX3M", "is a motorcycle game where you have to complete tracks.", "https://www.coolmathgames.com/sites/default/files/MotoX3M_OG-logo.jpg", "both", "Singleplayer");
 
-addGame("https://html5.gamedistribution.com/rvvASMiM/6befe00c202346eb9c06d1c23b925777/index.html?gd_sdk_referrer_url=https%3A%2F%2F2player.co%2Fjanissary-tower&gd_zone_config=eyJwYXJlbnRVUkwiOiJodHRwczovLzJwbGF5ZXIuY28vamFuaXNzYXJ5LXRvd2VyIiwicGFyZW50RG9tYWluIjoiMnBsYXllci5jbyIsInRvcERvbWFpbiI6IjJwbGF5ZXIuY28iLCJoYXNJbXByZXNzaW9uIjpmYWxzZSwibG9hZGVyRW5hYmxlZCI6dHJ1ZSwiaG9zdCI6Imh0bWw1LmdhbWVkaXN0cmlidXRpb24uY29tIiwidmVyc2lvbiI6IjEuNS4xNyJ9", "Janissary Tower", "is a 2 player game where you have to shoot each other and collect things to win.", "https://img.gamepix.com/games/janissary-tower/cover/janissary-tower.png?width=600&height=340&fit=cover&quality=90", "PC", "Multiplayer");
+addGame("https://html5.gamedistribution.com/rvvASMiM/6befe00c202346eb9c06d1c23b925777/index.html?gd_sdk_referrer_url=https%3A%2F%2F2player.co%2Fjanissary-tower&gd_zone_config=eyJwYXJlbnRVUkwiOiJodHRwczovLzJwbGF5ZXIuY28vamFuaXNzYXJ5LXRvd2VyIiwicGFyZW50RG9tYWluIjoiMnBsYXllci5jbyIsInRvcERvbWFpbiI6IjJwbGF5ZXIuY28iLCJoYXNJbXByZXNzaW9uIjpmYWxzZSwibG9hZGVyRW5hYmxlZCI6dHJ1ZSwiaG9zdCI6Imh0bWw1LmdhbWVkaXN0cmlidXRpb24uY29tIiwidmVyc2lvbiI6IjEuNS4xNyJ9", "Janissary Tower", "is a 2 player game where you have to shoot each other and collect things to win.", "https://img.tapimg.net/market/images/659c3daa1b418e8aa4510910569f0782.jpg?imageView2/2/w/720/h/720/q/80/format/jpg/interlace/1/ignore-error/1&t=1", "PC", "Multiplayer");
 
 addGame("https://hole-io.com/", "Hole.io", "is an online game where you, a hole, has to devour a whole city.", "https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_2.0/ncom/software/switch/70010000069917/28c5a57b2711d70dbeb4dd55155691e8135a3069bad3455547392878c0162861", "PC", "Online");
 
