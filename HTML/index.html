@@ -29,7 +29,12 @@ selection.addRange(range);
 var dataURL;
 
 function getDataURL() {
-dataURL = "data:text/html;base64," + btoa(textarea.value);
+dataURL = "data:text/html;base64,";
+try {
+dataURL += btoa(textarea.value);
+} catch (err) {
+console.error(err.message);
+}
 }
 
 function swapPages() {
