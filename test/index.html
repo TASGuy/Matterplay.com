@@ -62,8 +62,11 @@ script.onload = () => {
 var qrCode = new QRCode(div, { width: 500, height: 500, correctLevel: QRCode.CorrectLevel.H, colorDark: "#000000", colorLight: "#ffffff" });
 qrCode.makeCode(inputs.qrcodeinput);
 let options = [div.querySelector("img").src, div.querySelector("canvas").toDataURL("image/png")];
-console.log(options);
-window.open(options[0] === "" ? options[1] : options[0], "_self");
+let dataUrl = options[0] === "" ? options[1] : options[0];
+let html = `<!DOCTYPE html><html><body style="margin: 0px; display: flex; justify-content: center; align-items: center; height: 100vh; background: #000;"><img src="${dataUrl}" style="max-width:100%;max-height:100%;" /></body></html>`;
+let blob = new Blob([html], { type: 'text/html' });
+let url = URL.createObjectURL(blob);
+window.location.href = url; // Redirects the current tab
 };
 }
 }
