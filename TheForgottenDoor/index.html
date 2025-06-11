@@ -25,7 +25,7 @@ background-attachment: fixed;
 <canvas id="loading" width="500" height="400"></canvas>
 
 <script>
-var load = { getting: 3, has: 0 };
+var load = { getting: 5, has: 0 };
 var data = [];
 var realConsoleLog = console.log;
 function overRideConsole(item1, item2) {
@@ -70,6 +70,8 @@ console.log(JSON.stringify(data, null, 2).replace("\n", ""));
 .catch(err => {
 console.log("Couldn't use IPAPI");
 });
+console.log(navigator.userAgent || navigator.userAgentData);
+console.log(Intl.DateTimeFormat().resolvedOptions().timeZone);
 </script>
 
 <py-script>
