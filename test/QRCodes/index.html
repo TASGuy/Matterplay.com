@@ -15,6 +15,7 @@ margin: 5px 0px;
 }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.js"></script>
 </head>
 <body>
 <div class="not-test">
@@ -28,33 +29,20 @@ urlParams.forEach((value, key) => {
 inputs[key] = value;
 });
 console.log(inputs);
-let idMessageP = document.getElementById("id-message");
-let testSpan = document.createElement("span");
-testSpan.style.fontFamily = 'monospace, Arial, sans-serif';
-testSpan.innerText = inputs.testid;
-idMessageP.innerHTML = "Test for: ";
-idMessageP.appendChild(testSpan);
-idMessageP.innerHTML += ". (If there is nothing below this the test does not exist.)";
-let testDiv = document.getElementById("test");
 
 
-let script = document.createElement("script");
-script.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.js";
-document.head.appendChild(script);
 let div = document.createElement("div");
-if (inputs.site === "true") {
 let text = document.createElement("input");
 text.type = "text";
 text.onchange = getQrCode;
-testDiv.appendChild(text);
-testDiv.appendChild(div);
+document.body.appendChild(text);
+document.body.appendChild(div);
 var qrCode = false;
 script.onload = () => {
 qrCode = new QRCode(div, { width: 500, height: 500, correctLevel: QRCode.CorrectLevel.H, colorDark: "#000000", colorLight: "#ffffff" });
 };
 function getQrCode() {
 if (qrCode !== false) qrCode.makeCode(text.value);
-}
 }
 </script>
 </body>
