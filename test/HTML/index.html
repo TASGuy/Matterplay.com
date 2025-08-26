@@ -1,0 +1,60 @@
+<html><head>
+<title>HTML runner + to URL</title>
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAXNJREFUaEPtmdsSwjAIRM3/f3ScOk2nMmnYRUKk6mOlhANLbi211vpI/Cu3ASiluNThXNDmsz3TxrCI4aiA5hylWwaABsjYyQow76K2U3sgFICVEKJXtge2rCN+z9Ux9wAyUCgAqjnG7gqgB2+VW2gPIDJFKktLiHXaBgiV0Cg7XgCM/FDbUAmhQTF2oQBID/SCHynAPI0iA1l6APFLNzFaUpmpUAA0SMbuD7Bna0oPIFOrdXWlqtxOZOwM8XUADDVqG1oBNCjGLhSAldAIRJ6BEbkxiZm2DjTHSwCsGRi9Fyqh9ADpt9PpAdJLKD1AT0Kfzt+hs1B6gEgJeVYm9Ewsr1vkym1J4hKALVApWWu/LQPwqgYF4LljRXaziKR+CwDJyNteff/uNjyUi29zbC9QFfAEWNrEWi9oBxqv4F+zmeU7sRcAK5eeAkwAqJQ8V9yrMe8DoMkCzfpmp/UA40uzdb1ev92thJY9j/+n9oBHgJqPJ4ELvoDZLEuCAAAAAElFTkSuQmCC">
+</head><body>
+<style> html, body { overflow: hidden; font-family: Arial, sans-serif; } </style>
+<textarea id="textarea" placeholder="HTML code goes here..." style="position: absolute; inset: 0px 0px 50px; resize: none;"></textarea>
+<p id="paragraph" style="position: absolute; bottom: 10px; left: 0px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;"></p>
+<button id="button" onclick="getDataURL(); swapPages();" style="position: absolute; top: 0px; right: 0px; z-index: 1;">Execute</button>
+<iframe id="iframe" style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; display: none;"></iframe>
+<script>
+// Getting HTML elements:
+var textarea = document.getElementById("textarea");
+var checkbox = document.getElementById("checkbox");
+var label = document.getElementById("label");
+var paragraph = document.getElementById("paragraph");
+var button = document.getElementById("button");
+var iframe = document.getElementById("iframe");
+
+// Making the paragraph select all when selecting:
+paragraph.addEventListener('click', () => {
+const selection = window.getSelection();
+const range = document.createRange();
+range.selectNodeContents(paragraph);
+selection.removeAllRanges();
+selection.addRange(range);
+});
+
+// Initializing variables:
+var dataURL;
+
+function getDataURL() {
+dataURL = "data:text/html;base64,";
+try {
+dataURL += btoa(textarea.value);
+} catch (err) {
+console.error(err.message);
+}
+}
+
+function swapPages() {
+if (iframe.style.display === "none") {
+// Going to the code runner
+paragraph.style.display = "none";
+textarea.style.display = "none";
+iframe.style.display = "";
+iframe.srcdoc = textarea.value;
+button.innerHTML = "Back";
+} else {
+// Going to the code editor
+iframe.style.display = "none";
+iframe.srcdoc = "Code not running.";
+textarea.style.display = "";
+paragraph.style.display = "";
+button.innerHTML = "Execute";
+paragraph.innerText = dataURL;
+}
+}
+</script>
+</body>
+</html>
