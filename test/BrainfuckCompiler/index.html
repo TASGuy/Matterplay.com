@@ -1,0 +1,173 @@
+<html>
+<head>
+<title>TASGuy's Brainfuck Compiler</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/*body::-webkit-scrollbar {
+display: none;
+}*/
+
+* {
+font-size: 20px;
+}
+
+*::-webkit-scrollbar {
+width: 12px;
+background-color: #f0f0f0;
+}
+*::-webkit-scrollbar-thumb {
+background-color: #d4d4d4;
+border-radius: 6px;
+}
+*::-webkit-scrollbar-thumb:hover {
+background-color: #c4c4c4;
+cursor: pointer;
+}
+*::-webkit-scrollbar-button {
+background-color: #f0f0f0;
+height: 12px;
+border: 6px solid #828282;
+border-radius: 0px;
+cursor: default;
+}
+*::-webkit-scrollbar-button:vertical:decrement {
+border-color: transparent transparent #828282 transparent;
+}
+*::-webkit-scrollbar-button:vertical:increment {
+border-color: #828282 transparent transparent transparent;
+}
+
+body, div {
+margin: 0px;
+padding: 0px;
+font-family: Arial, sans-serif;
+}
+
+div.snap-container {
+scroll-snap-type: y proximity;
+overflow-x: hidden;
+overflow-y: scroll;
+scrollbar-gutter: stable;
+height: 100vh;
+}
+.scroll-snap {
+scroll-snap-align: start;
+}
+
+textarea {
+resize: none;
+font-family: monospace, sans-serif;
+padding: 2px;
+margin: 2vh;
+width: calc(100vw - 7.5vh);
+height: 40vh;
+border-radius: 0px;
+border: 1px solid #000;
+outline: none;
+background-color: #fafafa;
+color: #000;
+overflow-x: hidden;
+overflow-y: scroll;
+scrollbar-gutter: stable;
+/*scrollbar-width: auto;*/
+/*scrollbar-color: hotpink blue;*/
+/*scrollbar-color: #d4d4d4 #f0f0f0;*/
+}
+textarea::placeholder {
+color: #787878;
+}
+textarea#input2, textarea#output {
+height: 21.5vh;
+}
+textarea#output {
+resize: vertical;
+}
+
+div {
+width: 100vw;
+height: auto;
+}
+div.centered {
+text-align: center;
+}
+
+button#run {
+padding: 0px;
+margin: 0px;
+width: 50%;
+height: 5vh;
+border-radius: 0px;
+border: 1px solid #000;
+background-color: #ebebeb;
+color: #000;
+}
+button#run:hover {
+background-color: #dbdbdb;
+}
+</style>
+</head>
+<body>
+<div class="snap-container">
+
+<div class="scroll-snap">
+<textarea id="input" placeholder="Enter Brainfuck here."></textarea>
+</div>
+
+<div class="scroll-snap">
+<textarea id="input2" placeholder="Input the input to your Brainfuck here."></textarea>
+</div>
+
+<div class="centered">
+<button id="run">Run Brainfuck</button>
+</div>
+
+<div class="scroll-snap">
+<textarea id="output" placeholder="Your Brainfuck's output will appear here." readonly></textarea>
+</div>
+
+<div class="scroll-snap">
+<textarea id="compiled" placeholder="Your compiled Brainfuck (JavaScript) will appear here." readonly></textarea>
+</div>
+
+</div>
+<script>
+const input = document.getElementById("input");
+const input2 = document.getElementById("input2");
+const output = document.getElementById("output");
+const compiled = document.getElementById("compiled");
+const run = document.getElementById("run");
+run.addEventListener("click", () => {
+//console.log('clicky clicky babeeeee');
+output.value = '';
+compiled.value = '';
+
+// ChatGPT's FUNCTION!!!:
+/*
+
+ORIGINAL BRAINFUCK ONE:
+b=(I,c,i=0,p=0,t=Array(3e4).fill(0),o="",j=0)=>{for(;i<c.length;i++)switch(c[i]){case'>':p=(p+1)%3e4;break;case'<':p=(p+3e4-1)%3e4;break;case'+':t[p]=++t[p]&255;break;case'-':t[p]=--t[p]&255;break;case'.':o+=String.fromCharCode(t[p]);break;case',':t[p]=I.charCodeAt(j++)||0;break;case'[':if(!t[p])i=c.indexOf(']',i);break;case']':if(t[p])i=c.lastIndexOf('[',i)}return o}
+output.value = b(input2.value, input.value);
+
+MORE SMALLER ONE:
+b=(I,c,i=0,p=0,t=Array(3e4).fill(0),o="",j=0)=>{for(;i<c.length;i++)with(Math)switch(c[i]){case'>':p=++p%3e4;break;case'<':p=(--p+3e4)%3e4;break;case'+':t[p]=++t[p]&255;break;case'-':t[p]=--t[p]&255;break;case'.':o+=String.fromCharCode(t[p]);break;case',':t[p]=I.charCodeAt(j++)||0;break;case'[':if(!t[p])i=c.indexOf(']',i);break;case']':if(t[p])i=c.lastIndexOf('[',i)}return o}
+
+ERROR CHECKER:
+chk=c=>{let s=[];for(let i=0;i<c.length;i++){if(c[i]=='[')s.push(i);if(c[i]==']'){if(!s.length)return 0;s.pop()}}return s.length?0:1}
+
+RUNNER + CHECKER:
+b=(I,c,i=0,p=0,t=Array(3e4).fill(0),o="",j=0,k=0)=>{let S=[];for(;i<c.length;i++){if(++k>1e6)return"ERROR";switch(c[i]){case'>':p=++p%3e4;break;case'<':p=(--p+3e4)%3e4;break;case'+':t[p]=++t[p]&255;break;case'-':t[p]=--t[p]&255;break;case'.':o+=String.fromCharCode(t[p]);break;case',':t[p]=I.charCodeAt(j++)||0;break;case'[':if(!t[p]){let d=1;while(d&&++i<c.length){c[i]=='['&&d++;c[i]==']'&&d--}if(d)return"ERROR";}else S.push(i);break;case']':if(!S.length)return"ERROR";if(t[p])i=S[S.length-1];else S.pop()}}return S.length?"ERROR":o}
+
+*/
+
+b=(I,c,i=0,p=0,t=Array(3e4).fill(0),o="",j=0,k=0)=>{let S=[];for(;i<c.length;i++){if(++k>1e6)return"ERROR";switch(c[i]){case'>':p=++p%3e4;break;case'<':p=(--p+3e4)%3e4;break;case'+':t[p]=++t[p]&255;break;case'-':t[p]=--t[p]&255;break;case'.':o+=String.fromCharCode(t[p]);break;case',':t[p]=I.charCodeAt(j++)||0;break;case'[':if(!t[p]){let d=1;while(d&&++i<c.length){c[i]=='['&&d++;c[i]==']'&&d--}if(d)return"ERROR";}else S.push(i);break;case']':if(!S.length)return"ERROR";if(t[p])i=S[S.length-1];else S.pop()}}return S.length?"ERROR":o};
+
+output.value = b(input2.value, input.value);
+
+compiled.value = `b=(I,c,i=0,p=0,t=Array(3e4).fill(0),o="",j=0,k=0)=>{let S=[];for(;i<c.length;i++){if(++k>1e6)return"ERROR";switch(c[i]){case'>':p=++p%3e4;break;case'<':p=(--p+3e4)%3e4;break;case'+':t[p]=++t[p]&255;break;case'-':t[p]=--t[p]&255;break;case'.':o+=String.fromCharCode(t[p]);break;case',':t[p]=I.charCodeAt(j++)||0;break;case'[':if(!t[p]){let d=1;while(d&&++i<c.length){c[i]=='['&&d++;c[i]==']'&&d--}if(d)return"ERROR";}else S.push(i);break;case']':if(!S.length)return"ERROR";if(t[p])i=S[S.length-1];else S.pop()}}return S.length?"ERROR":o};console.log(b(${'`' + input2.value + '`'},${'`' + input.value + '`'}));`;
+
+// My code... (base64 converted for now.)
+`aWYgKGlucHV0LnZhbHVlLnNwbGl0KCdbJykubGVuZ3RoIC0gMSAhPT0gaW5wdXQudmFsdWUuc3BsaXQoJ10nKS5sZW5ndGggLSAxKSB7Cm91dHB1dC52YWx1ZSA9ICdFcnJvcjogTG9vcCBub3QgZW5jbG9zZWQgY29ycmVjdGx5Lic7CnJldHVybjsKfSBlbHNlIHsKbGV0IHN0ciA9ICcnOwpsZXQgc3BsaXRPcGVuID0gW107CmxldCBzcGxpdENsb3NlZCA9IFtdOwpmb3IgKGxldCBpID0gMDsgaSA8IGlucHV0LnZhbHVlLmxlbmd0aDsgaSsrKSB7CnN0ciArPSBpbnB1dC52YWx1ZVtpXTsKaWYgKGlucHV0LnZhbHVlW2ldID09PSAnWycpIHNwbGl0T3Blbi5wdXNoKHN0cik7CmlmIChpbnB1dC52YWx1ZVtpXSA9PT0gJ10nKSBzcGxpdENsb3NlZC5wdXNoKHN0cik7Cn0KZm9yIChsZXQgaSA9IDA7IGkgPCBpbnB1dC52YWx1ZS5zcGxpdCgnWycpLmxlbmd0aCAtIDE7IGkrKykgewppZiAoc3BsaXRPcGVuW2ldLmxlbmd0aCA+IHNwbGl0Q2xvc2VkW2ldLmxlbmd0aCkgewpvdXRwdXQudmFsdWUgPSAnRXJyb3I6IExvb3Agbm90IGVuY2xvc2VkIGNvcnJlY3RseS4nOwpyZXR1cm47Cn0KfQp9Cgp2YXIgcmVhbENvbnNvbGVMb2cgPSBjb25zb2xlLmxvZzsKY29uc29sZS5sb2cgPSAobG9nKSA9PiB7Cm91dHB1dC52YWx1ZSA9IGxvZzsKcmVhbENvbnNvbGVMb2cobG9nKTsKfTsKCmxldCBjb21tYW5kcyA9IGlucHV0LnZhbHVlLnNwbGl0KCcnKTsKLypmb3IgKGxldCBpID0gMDsgaSA8IGNvbW1hbmRzLmxlbmd0aDsgaSsrKSB7CmlmICghJzw+Ky0uLFtdJy5pbmNsdWRlcyhjb21tYW5kc1tpXSkpIHsgY29tbWFuZHMuc3BsaWNlKGksIDEpOyBpLS07IH0KfSovCi8vY29uc29sZS5sb2coY29tbWFuZHMpOwpsZXQgd3JpdHRlbkpzID0gIid1c2Ugc3RyaWN0Jzt2YXIgcD0wLG89JycsaT1BcnJheS5mcm9tKCciICsgaW5wdXQyLnZhbHVlICsgIicsYz0+Yy5jaGFyQ29kZUF0KDApKSxpaT0wLG12PW5ldyBVaW50OEFycmF5KDMwMDAwKTtmdW5jdGlvbiBtKG49MCxjPTEsaT0oKHAlMzAwMDApKzMwMDAwKSUzMDAwMCl7bXZbaV0qPWM7cmV0dXJuIG12W2ldKz1uO31mdW5jdGlvbiBxKCl7bys9U3RyaW5nLmZyb21DaGFyQ29kZShtKCkpO30iOwpsZXQgaXNDb21tZW50ID0gZmFsc2U7CmZvciAobGV0IGkgPSAwOyBpIDwgY29tbWFuZHMubGVuZ3RoOyBpKyspIHsKaWYgKCEnPD4rLS4sW10KJy5pbmNsdWRlcyhjb21tYW5kc1tpXSkpIHsKaWYgKCFpc0NvbW1lbnQpIHdyaXR0ZW5KcyArPSAiLyoiOwp3cml0dGVuSnMgKz0gY29tbWFuZHNbaV07CmlzQ29tbWVudCA9IHRydWU7Cn0gZWxzZSB7CmlmIChpc0NvbW1lbnQpIHdyaXR0ZW5KcyArPSAiKi8iOwppZiAoY29tbWFuZHNbaV0gPT09ICcKJykgewp3cml0dGVuSnMgKz0gY29tbWFuZHNbaV07Cn0gZWxzZSB7CmlmIChjb21tYW5kc1tpXSA9PT0gJz4nKSB3cml0dGVuSnMgKz0gJ3ArKzsnOwppZiAoY29tbWFuZHNbaV0gPT09ICc8Jykgd3JpdHRlbkpzICs9ICdwLS07JzsKaWYgKGNvbW1hbmRzW2ldID09PSAnKycpIHdyaXR0ZW5KcyArPSAnbSgxKTsnOwppZiAoY29tbWFuZHNbaV0gPT09ICctJykgd3JpdHRlbkpzICs9ICdtKC0xKTsnOwppZiAoY29tbWFuZHNbaV0gPT09ICcuJykgd3JpdHRlbkpzICs9ICdxKCk7JzsKaWYgKGNvbW1hbmRzW2ldID09PSAnLCcpIHdyaXR0ZW5KcyArPSAnbShpW2lpXSwwKTtpaSsrOyc7CmlmIChjb21tYW5kc1tpXSA9PT0gJ1snKSB3cml0dGVuSnMgKz0gJ3doaWxlKG0oKSE9PTApeyc7CmlmIChjb21tYW5kc1tpXSA9PT0gJ10nKSB3cml0dGVuSnMgKz0gJ30nOwp9CmlzQ29tbWVudCA9IGZhbHNlOwp9Cn0KaWYgKGlzQ29tbWVudCkgd3JpdHRlbkpzICs9ICIqLyI7CndyaXR0ZW5KcyArPSAnY29uc29sZS5sb2cobyk7JzsKLy9jb25zb2xlLmxvZyh3cml0dGVuSnMpOwpjb21waWxlZC52YWx1ZSA9IHdyaXR0ZW5KczsKZXZhbCh3cml0dGVuSnMpOw==`;
+});
+</script>
+</body>
+</html>
