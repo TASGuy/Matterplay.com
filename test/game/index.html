@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TEST</title>
+</head>
+<body>
+<script>
+/*function getUrlData() {
+let list = window.location.hash.split('/');
+list[0] = list[0].slice(1);
+list = list.filter(string => string !== "");
+return list;
+}
+console.log(getUrlData());*/
+
+
+(function() {
+// Detect if we're being loaded into an <img>
+// Trick: <img> requests won't execute scripts or render HTML.
+// So instead, we use <meta http-equiv="refresh"> dynamically.
+if (window.top !== window) {
+// Inside <iframe> or embed -> do nothing
+return;
+}
+
+// Detect if we are inside <img> request
+// Images don’t parse HTML, they just take the first supported image data.
+// We can prepend a redirect via location.replace to a data:image.
+const params = new URLSearchParams(location.search);
+if (params.has("asimg")) {
+// Replace body with raw image
+document.write('<img src="https://placehold.co/300x400/">');
+document.close();
+}
+})();
+</script>
+<p>heyyy</p>
+</body>
+</html>
