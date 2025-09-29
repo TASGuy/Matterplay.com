@@ -1,39 +1,16 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>TEST</title>
-</head>
 <body>
+<canvas id=c width=200 height=200 style=display:none></canvas>
+<img id=i>
 <script>
-/*function getUrlData() {
-let list = window.location.hash.split('/');
-list[0] = list[0].slice(1);
-list = list.filter(string => string !== "");
-return list;
+let c=document.getElementById("c"),x=c.getContext("2d");
+if(Math.random()<.5){
+  x.fillStyle="red";x.fillRect(0,0,200,200);
+}else{
+  x.fillStyle="blue";x.beginPath();x.arc(100,100,80,0,7);x.fill();
 }
-console.log(getUrlData());*/
-
-
-(function() {
-// Detect if we're being loaded into an <img>
-// Trick: <img> requests won't execute scripts or render HTML.
-// So instead, we use <meta http-equiv="refresh"> dynamically.
-if (window.top !== window) {
-// Inside <iframe> or embed -> do nothing
-return;
-}
-
-// Detect if we are inside <img> request
-// Images don’t parse HTML, they just take the first supported image data.
-// We can prepend a redirect via location.replace to a data:image.
-const params = new URLSearchParams(location.search);
-if (params.has("asimg")) {
-// Replace body with raw image
-document.write('<img src="https://placehold.co/300x400/">');
-document.close();
-}
-})();
+i.src=c.toDataURL();
 </script>
-<p>heyyy</p>
 </body>
 </html>
